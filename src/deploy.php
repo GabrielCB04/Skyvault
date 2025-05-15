@@ -147,6 +147,10 @@
       width: 100%; 
       height: 100%;
     }
+
+    .img-box {
+      margin-top: 578px !important;
+    }
   </style>
 </head>
 
@@ -192,9 +196,6 @@
           <div class="form_container">
 
 <?php
-$errorMsg = "";
-$successMsg = "";
-
 // Procesar el formulario al inicio
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // First check if user is logged in
@@ -203,7 +204,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Obtén la URL del repositorio de GitHub desde el formulario
         $githubUrl = filter_input(INPUT_POST, 'github_url', FILTER_SANITIZE_URL);
-
+        
+        // Obtener datos de la base de datos del formulario
+        $dbname_cliente = filter_input(INPUT_POST, 'nombre_db', FILTER_SANITIZE_STRING);
+        $db_user = filter_input(INPUT_POST, 'usuario_mysql', FILTER_SANITIZE_STRING);
+        $db_pass = $_POST['passwd_mysql']; // No sanitizar para permitir caracteres especiales
+        
         // Verifica que la URL sea válida
         if (filter_var($githubUrl, FILTER_VALIDATE_URL)) {
             // Define la carpeta donde se clonará el repositorio
@@ -235,15 +241,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($returnVar === 0) {
                         $successMsg = "El repositorio se ha clonado correctamente";
                         
-                        // Establecer la conexión a la base de datos
+                        // Crear la base de datos
+                        // En XAMPP, típicamente la contraseña está vacía para root
+                        $admin_conn = new mysqli("localhost", "root", "", "");
+
+                        // Verificar conexión
+                        if ($admin_conn->connect_error) {
+                            error_log("Error conectando como admin: " . $admin_conn->connect_error);
+                            $successMsg = "Repositorio clonado pero hubo un error con la base de datos.";
+                        } else {
+                            // Crear base de datos
+                            $sql_create_db = "CREATE DATABASE IF NOT EXISTS `" . $admin_conn->real_escape_string($dbname_cliente) . "` 
+                                DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"; 
+
+                            if ($admin_conn->query($sql_create_db) === TRUE) {
+                                // Crear usuario específico para esta base de datos
+                                $sql_create_user = "CREATE USER IF NOT EXISTS '" . $admin_conn->real_escape_string($db_user) . 
+                                                "'@'localhost' IDENTIFIED BY '" . $admin_conn->real_escape_string($db_pass) . "'";
+                                $admin_conn->query($sql_create_user);
+                                
+                                $sql_grant = "GRANT ALL PRIVILEGES ON `" . $admin_conn->real_escape_string($dbname_cliente) . 
+                                            "`.* TO '" . $admin_conn->real_escape_string($db_user) . "'@'localhost'";
+                                $admin_conn->query($sql_grant);
+                                $admin_conn->query("FLUSH PRIVILEGES");
+                                
+                                $successMsg .= " y se ha creado la base de datos correctamente.";
+
+                                // Buscar archivos SQL en la carpeta /bd del repositorio
+                                $bd_dir = $repoPath . '/bd';
+                                if (is_dir($bd_dir)) {
+                                    $sql_files = glob($bd_dir . '/*.sql');
+                                    
+                                    if (!empty($sql_files)) {
+                                        // Tomar el primer archivo SQL encontrado
+                                        $sql_file = $sql_files[0];
+                                        
+                                        // Importar el archivo SQL directamente
+                                        $import_result = importarSQL($sql_file, $dbname_cliente, $db_user, $db_pass);
+                                        
+                                        if ($import_result === true) {
+                                            $successMsg .= " Base de datos importada correctamente.";
+                                        } else {
+                                            $successMsg .= " Error al importar la base de datos: " . $import_result;
+                                        }
+                                    } else {
+                                        $successMsg .= " No se encontraron archivos SQL para importar.";
+                                    }
+                                } else {
+                                    $successMsg .= " No se encontró directorio de bases de datos.";
+                                }
+                            } else {
+                                error_log("Error creando base de datos: " . $admin_conn->error);
+                                $successMsg = "Repositorio clonado pero hubo un error creando la base de datos.";
+                            }
+                            $admin_conn->close();
+                        }
+                        
+                        // Establecer la conexión a la base de datos para Skyvault
                         require_once 'db.php'; // Archivo en el mismo directorio que deploy.php
                         
-                        // Si no tienes un archivo de conexión, crea la conexión aquí:
+                        // Si no tienes un archivo de conexión o falló, crea la conexión aquí:
                         if (!isset($conn)) {
                             $servername = "localhost";
-                            $username = "root"; // Cambia esto por tu usuario de MySQL
-                            $password = ""; // Cambia esto por tu contraseña
-                            $dbname = "skyvault"; // Cambia esto por el nombre de tu base de datos
+                            $username = "root"; 
+                            $password = ""; // Sin contraseña para XAMPP típicamente
+                            $dbname = "skyvault"; 
                             
                             // Crear conexión
                             $conn = new mysqli($servername, $username, $password, $dbname);
@@ -301,6 +363,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+/**
+ * Importa un archivo SQL directamente
+ * @param string $file_path Ruta completa al archivo SQL
+ * @param string $db_name Nombre de la base de datos
+ * @param string $db_user Usuario de la base de datos
+ * @param string $db_pass Contraseña de la base de datos
+ * @return mixed True si la importación fue exitosa, mensaje de error si falló
+ */
+function importarSQL($file_path, $db_name, $db_user, $db_pass) {
+    try {
+        // Leer el contenido del archivo SQL
+        $sql_content = file_get_contents($file_path);
+        if ($sql_content === false) {
+            return "No se pudo leer el archivo SQL";
+        }
+        
+        // Conectar a la base de datos
+        $conn = new mysqli("localhost", $db_user, $db_pass, $db_name);
+        if ($conn->connect_error) {
+            return "Error de conexión: " . $conn->connect_error;
+        }
+        
+        // Aumentar el tiempo máximo de ejecución y el tamaño máximo de paquete
+        $conn->query("SET GLOBAL max_allowed_packet=16777216"); // 16M
+        $conn->query("SET GLOBAL net_read_timeout=300"); // 5 minutos
+        
+        // Mejorar el manejo de caracteres
+        $conn->set_charset("utf8mb4");
+        
+        // Dividir el contenido en consultas individuales
+        $queries = explode(';', $sql_content);
+        
+        // Ejecutar cada consulta
+        foreach ($queries as $query) {
+            $query = trim($query);
+            if (!empty($query)) {
+                $result = $conn->query($query);
+                if ($result === false) {
+                    error_log("Error ejecutando consulta: " . $conn->error);
+                    error_log("Consulta: " . substr($query, 0, 150) . "...");
+                }
+            }
+        }
+        
+        $conn->close();
+        return true;
+    } catch (Exception $e) {
+        error_log("Excepción importando SQL: " . $e->getMessage());
+        return "Error: " . $e->getMessage();
+    }
+}
 ?>
             
             <div class="message-container">
@@ -309,7 +423,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <?php endif; ?>
               
               <?php if (!empty($successMsg)): ?>
-                  <div class="alert alert-success"><?php echo $successMsg; ?></div>
+                  <div class="alert alert-success">El repositorio se ha subido correctamente</div>
               <?php endif; ?>
             </div>
             
@@ -317,10 +431,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div>
                 <input type="text" name="github_url" placeholder="Enlace del repositorio" required />
               </div>
+
+                <div>
+                <input type="text" name="nombre_db" placeholder="Nombre de la base de datos MySQL" required />
+              </div>
+
+               <div>
+                <input type="text" name="usuario_mysql" placeholder="Nombre de usuario de MySQL" required />
+              </div>
+
+               <div>
+                <input type="text" name="passwd_mysql" placeholder="Contraseña de MySQL" />
+              </div>
+
               <div class="btn_box text-center">
                 <button class="transparent-btn" style="transform: none !important; transition: background-color 0.3s ease !important; position: relative !important;">
                   DESPLEGAR
                 </button>
+
+                
               </div>
             </form>
             
@@ -334,15 +463,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- info section -->
 <?php include 'footer.php'; ?>
-  <!-- footer section -->
-
-  <!-- jQery -->
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <!-- bootstrap js -->
-  <script src="js/bootstrap.js"></script>
-  <!-- custom js -->
-  <script src="js/custom.js"></script>
-
 </body>
 
 </html>
