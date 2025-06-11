@@ -1,10 +1,9 @@
 <?php
-// Ensure session is started at the beginning of each page
+// Inicio de sesión al principio de cada página
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Function to check if the current page matches a given URL
 function isActive($pageName) {
     $currentPage = basename($_SERVER['PHP_SELF']);
     return ($currentPage == $pageName) ? 'active' : '';
@@ -13,36 +12,20 @@ function isActive($pageName) {
 <!DOCTYPE html>
 <html>
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <link rel="icon" href="images/fevicon.png" type="image/gif" />
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="author" content="" />
 
   <title>Skyvault</title>
 
-  <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-
-  <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-  <!-- font awesome style -->
-  <link href="css/font-awesome.min.css" rel="stylesheet" />
-
-  <!-- Custom styles for this template -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 
   <script src="js/dotlottie-player.min.js"></script>
 
-  <!-- Add this new style to center the logo and title -->
   <style>
     .navbar-brand {
       display: flex;
@@ -61,7 +44,6 @@ function isActive($pageName) {
       height: 40px;
       margin-right: 15px;
     }
-    /* Ensure the navbar is properly aligned for responsive design */
     @media (max-width: 991.98px) {
       .navbar-brand {
         margin: 0;
@@ -72,9 +54,8 @@ function isActive($pageName) {
       }
     }
     
-    /* Custom dropdown styles to match header */
     .dropdown-menu {
-      background-color: rgba(40, 43, 56, 0.95); /* Match the dark header background */
+      background-color: rgba(40, 43, 56, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 0.25rem;
       margin-top: 0.5rem;
@@ -89,7 +70,7 @@ function isActive($pageName) {
     
     .dropdown-item:hover, .dropdown-item:focus {
       background-color: rgba(255, 255, 255, 0.1);
-      color: #4ac4f3; /* Match the hover color of navbar items */
+      color: #4ac4f3; 
     }
     
     .dropdown-divider {
@@ -106,7 +87,6 @@ function isActive($pageName) {
       border-top-color: #4ac4f3;
     }
     
-    /* Ensure dropdown appears on hover as well as click for desktop */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -115,17 +95,13 @@ function isActive($pageName) {
   </style>
   
   <?php
-  // Add page-specific CSS if the variable is set
-  if(isset($pageSpecificCSS)) {
-      echo $pageSpecificCSS;
-  }
+
   ?>
 </head>
 
 <body <?php echo (isset($bodyClass)) ? 'class="'.$bodyClass.'"' : ''; ?>>
 
   <div class="hero_area">
-    <!-- header section starts -->
     <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
@@ -180,4 +156,3 @@ function isActive($pageName) {
         </nav>
       </div>
     </header>
-    <!-- end header section -->

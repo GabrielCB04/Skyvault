@@ -1,11 +1,9 @@
 <?php
-// Iniciamos la sesión
 session_start();
 
 // Incluimos los archivos de conexión a la base de datos
 require_once 'db.php';
 
-// Variables para almacenar mensajes y datos del formulario
 $nombre = "";
 $apellidos = "";
 $correo = "";
@@ -13,27 +11,27 @@ $errorMsg = "";
 
 // Si el usuario ya está logueado, redirigimos al dashboard
 if (isset($_SESSION['id_usuario'])) {
-    header("Location: index.html");
+    header("Location: index.php");
     exit();
 }
 
 // Procesamos el formulario cuando se envía por POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validar el nombre
+    // Validar nombre
     if (empty($_POST["nombre"])) {
         $errorMsg = "El nombre es obligatorio";
     } else {
         $nombre = trim($_POST["nombre"]);
     }
     
-    // Validar los apellidos
+    // Validar apellidos
     if (empty($_POST["apellidos"])) {
         $errorMsg = "Los apellidos son obligatorios";
     } else {
         $apellidos = trim($_POST["apellidos"]);
     }
     
-    // Validar el correo electrónico
+    // Validar correo electrónico
     if (empty($_POST["correo"])) {
         $errorMsg = "El correo electrónico es obligatorio";
     } else {
@@ -44,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-    // Validar la contraseña
+    // Validar contraseña
     if (empty($_POST["password"])) {
         $errorMsg = "La contraseña es obligatoria";
     } else {
@@ -55,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-    // Validar la confirmación de contraseña
+    // Validar confirmación contraseña
     if (empty($_POST["confirm_password"])) {
         $errorMsg = "Debes confirmar tu contraseña";
     } else {
@@ -96,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['correo'] = $correo;
                     
                     // Redirigir al dashboard
-                    header("Location: index.html");
+                    header("Location: index.php");
                     exit();
                 } else {
                     $errorMsg = "Error al registrar el usuario. Inténtalo de nuevo.";
@@ -112,37 +110,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <link rel="icon" href="images/fevicon.png" type="image/gif" />
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="author" content="" />
 
   <title>Skyvault</title>
 
-
-  <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-
-  <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-  <!-- font awesome style -->
-  <link href="css/font-awesome.min.css" rel="stylesheet" />
-
-  <!-- Custom styles for this template -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
-
   <script src="js/dotlottie-player.min.js"></script>
 
-  <!-- Add this new style to center the logo and title -->
   <style>
     .navbar-brand {
       display: flex;
@@ -161,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       height: 40px;
       margin-right: 15px;
     }
-    /* Ensure the navbar is properly aligned for responsive design */
+    /* navbar alineado con el diseño responsive */
     @media (max-width: 991.98px) {
       .navbar-brand {
         margin: 0;
@@ -171,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         margin-left: 10px;
       }
     }
-    /* Estilo moderno para los mensajes de error */
+    /* Estilo de los mensajes de error */
     .alert-danger {
       background-color: rgba(255, 76, 76, 0.1);
       border: 4px solid #ff4c4c;
@@ -202,12 +182,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="sub_page">
 
   <div class="hero_area">
-    <!-- header section strats -->
   <?php include 'header.php'; ?>
-    <!-- end header section -->
   </div>
 
-<!-- contact section -->
 <section class="contact_section layout_padding">
   <div class="container">
     <div class="heading_container heading_center">
@@ -252,9 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
 </section>
-<!-- end contact section -->
 
-  <!-- info section -->
 <?php include 'footer.php'; ?>
 
 </body>

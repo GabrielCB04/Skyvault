@@ -2,18 +2,14 @@
 // Incluir el archivo de configuración
 require_once 'config.php';
 
-/**
- * Clase Database
- * Esta clase maneja la conexión a la base de datos MySQL
- */
+
+// Esta clase maneja la conexión a la base de datos MySQL
 class Database {
     // Variable privada para almacenar la conexión
     private $conn;
     
-    /**
-     * Método para conectar a la base de datos
-     * @return PDO Objeto de conexión PDO
-     */
+    // Conectar a la base de datos
+
     public function connect() {
         // Inicializamos la conexión como nula
         $this->conn = null;

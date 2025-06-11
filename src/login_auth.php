@@ -1,5 +1,4 @@
 <?php
-// Iniciamos la sesión
 session_start();
 
 // Si el usuario ya está logueado, redirigimos al dashboard
@@ -17,14 +16,14 @@ require_once 'config.php';
 
 // Procesamos el formulario solo cuando se envía por POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validar el correo electrónico
+    // Validar correo electrónico
     if (empty($_POST["correo"])) {
         $errorMsg = "El correo electrónico es obligatorio";
     } else {
         $correo = trim($_POST["correo"]);
     }
     
-    // Validar la contraseña
+    // Validar contraseña
     if (empty($_POST["password"])) {
         $errorMsg = "La contraseña es obligatoria";
     } else {
@@ -43,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->rowCount() > 0) {
                 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                // Verificamos la contraseña
+                // Verificamos contraseña
                 if (password_verify($password, $usuario['passwd'])) {
                     // Guardamos los datos del usuario en la sesión
                     $_SESSION['id_usuario'] = $usuario['id_usuario'];
@@ -66,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Si hay errores, guardamos el mensaje en la sesión y volvemos al formulario
     if (!empty($errorMsg)) {
         $_SESSION['login_error'] = $errorMsg;
-        $_SESSION['login_correo'] = $correo; // Guardamos el correo para rellenar el campo
+        $_SESSION['login_correo'] = $correo; 
         header("Location: ../login.php");
         exit();
     }

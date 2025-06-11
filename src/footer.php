@@ -1,4 +1,3 @@
-<!-- info section -->
 <section class="info_section layout_padding2">
   <div class="container">
     <div class="row">
@@ -14,8 +13,6 @@
                 Gran Vía, 25
               </span>
             </a>
-            <!-- Phone call button also removed from info section -->
-            <a href="">
               <i class="fa fa-envelope" aria-hidden="true"></i>
               <span>
                 skyvault@gmail.com
@@ -93,9 +90,8 @@
     </div>
   </div>
 </section>
-<!-- end info section -->
 
-<!-- footer section -->
+<!-- sección que incluye el año y el copyright -->
 <footer class="footer_section">
   <div class="container">
     <p>
@@ -103,11 +99,6 @@
     </p>
   </div>
 </footer>
-<!-- footer section -->
 
-<!-- jQery -->
-<script src="js/jquery-3.4.1.min.js"></script>
-<!-- bootstrap js -->
 <script src="js/bootstrap.js"></script>
-<!-- custom js -->
-<script src="js/custom.js"></script>
+

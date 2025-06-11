@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 // Verificamos si el usuario está logueado
 if (!isset($_SESSION['id_usuario'])) {
-    // Si no está logueado, redirigimos al login
+    // Si no está logueado redirigimos al login
     header("Location: login.php");
     exit();
 }
@@ -13,7 +13,6 @@ if (!isset($_SESSION['id_usuario'])) {
 // Incluimos los archivos de conexión a la base de datos
 require_once 'db.php';
 
-// Variables para datos del usuario
 $usuario = [];
 $numDespliegues = 0;
 $errorMsg = "";
@@ -47,15 +46,14 @@ try {
 // Variables para establecer propiedades específicas de la página
 $bodyClass = "sub_page";
 
-// Incluimos el header
+
 include 'header.php';
 ?>
 
 <div class="hero_area">
-  <!-- header ya incluido arriba -->
 </div>
 
-<!-- about section -->
+
 <section class="about_section layout_padding">
   <div class="container">
     <div class="heading_container heading_center">
@@ -89,6 +87,5 @@ include 'header.php';
     </div>
   </div>
 </section>
-<!-- end about section -->
 
 <?php include 'footer.php'; ?>

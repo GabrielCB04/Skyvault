@@ -1,20 +1,17 @@
 <?php
-// Iniciamos la sesión
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verificamos si el usuario está logueado
+// Redirigir al login si el usuario no está logueado
 if (!isset($_SESSION['id_usuario'])) {
-    // Si no está logueado, redirigimos al login
     header("Location: login.php");
     exit();
 }
 
-// Incluimos los archivos de conexión a la base de datos
 require_once 'db.php';
 
-// Variables para datos de despliegues
+// Variables para los datos de despliegues
 $despliegues = [];
 $errorMsg = "";
 
@@ -24,7 +21,7 @@ try {
     
     // Obtenemos los despliegues del usuario
     $stmt = $conn->prepare("SELECT id_despliegue, nombre_proyecto, url_repositorio, 
-                            puerto, estado, fecha_creacion 
+                            puerto, estado, fecha_creacion, url_publica 
                             FROM Despliegues 
                             WHERE id_usuario = :id_usuario 
                             ORDER BY fecha_creacion DESC");
@@ -41,15 +38,14 @@ try {
 // Variables para establecer propiedades específicas de la página
 $bodyClass = "sub_page";
 
-// Incluimos el header
+
 include 'header.php';
 ?>
 
 <div class="hero_area">
-  <!-- header ya incluido arriba -->
 </div>
 
-<!-- section de páginas -->
+
 <section class="about_section layout_padding">
   <div class="container">
     <div class="heading_container heading_center">
@@ -71,41 +67,42 @@ include 'header.php';
       <div class="alert alert-danger"><?php echo $errorMsg; ?></div>
     <?php endif; ?>
 
-    <?php if (empty($despliegues)): ?>
-      <div class="row">
-        <div class="col-md-6 mx-auto">
-          <div class="detail-box">
-            <p class="text-center">Aún no has desplegado ninguna página web en nuestra plataforma.</p>
-            <div class="btn-box text-center mt-4">
-              <a href="deploy.php" class="btn-1">Desplegar mi primera página</a>
-            </div>
-          </div>
+<?php if (empty($despliegues)): ?>
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="detail-box">
+        <p class="text-center">Aún no has desplegado ninguna página web en nuestra plataforma.</p>
+        <div class="btn-box text-center mt-4">
+          <a href="deploy.php" class="btn-1">Desplegar mi primera página</a>
         </div>
       </div>
-    <?php else: ?>
-      <div class="row">
-        <?php foreach ($despliegues as $despliegue): ?>
-          <div class="col-md-6">
-            <div class="detail-box" style="margin-bottom: 25px;">
-              <div class="heading_container">
-                <h4><?php echo htmlspecialchars($despliegue['nombre_proyecto']); ?></h4>
-              </div>
-              <div class="info-container">
-                <p><strong>Estado:</strong> 
-                  <span class="<?php echo $despliegue['estado'] ? 'text-success' : 'text-danger'; ?>">
-                    <?php echo $despliegue['estado'] ? 'Activo' : 'Inactivo'; ?>
-                  </span>
-                </p>
-                <p><strong>Repositorio:</strong> <?php echo htmlspecialchars(basename($despliegue['url_repositorio'])); ?></p>
-                <p><strong>Creado:</strong> <?php echo date('d/m/Y', strtotime($despliegue['fecha_creacion'])); ?></p>
-              </div>
+    </div>
+  </div>
+<?php else: ?>
+  <div class="row">
+    <?php foreach ($despliegues as $despliegue): ?>
+      <div class="col-md-6">
+        <a href="<?php echo htmlspecialchars($despliegue['url_publica']); ?>" target="_blank">
+          <div class="detail-box" style="margin-bottom: 25px;">
+            <div class="heading_container">
+              <h4><?php echo htmlspecialchars($despliegue['nombre_proyecto']); ?></h4>
+            </div>
+            <div class="info-container">
+              <p><strong>Estado:</strong> 
+                <span class="<?php echo $despliegue['estado'] ? 'text-success' : 'text-danger'; ?>">
+                  <?php echo $despliegue['estado'] ? 'Activo' : 'Inactivo'; ?>
+                </span>
+              </p>
+              <p><strong>Repositorio:</strong> <?php echo htmlspecialchars(basename($despliegue['url_repositorio'])); ?></p>
+              <p><strong>Creado:</strong> <?php echo date('d/m/Y', strtotime($despliegue['fecha_creacion'])); ?></p>
             </div>
           </div>
-        <?php endforeach; ?>
-      </div>  
-    <?php endif; ?>
+        </a>
+      </div>
+    <?php endforeach; ?>
+  </div>  
+<?php endif; ?>
   </div>
 </section>
-<!-- end section -->
 
 <?php include 'footer.php'; ?>

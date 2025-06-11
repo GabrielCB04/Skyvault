@@ -1,11 +1,9 @@
 <?php
-// Iniciamos la sesión
 session_start();
 
 // Incluimos los archivos de conexión a la base de datos
 require_once 'db.php';
 
-// Variables para almacenar mensajes y datos del formulario
 $correo = "";
 $errorMsg = "";
 
@@ -17,14 +15,14 @@ if (isset($_SESSION['id_usuario'])) {
 
 // Procesamos el formulario cuando se envía por POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validar el correo electrónico
+    // Validar correo electrónico
     if (empty($_POST["correo"])) {
         $errorMsg = "El correo electrónico es obligatorio";
     } else {
         $correo = trim($_POST["correo"]);
     }
     
-    // Validar la contraseña
+    // Validar contraseña
     if (empty($_POST["password"])) {
         $errorMsg = "La contraseña es obligatoria";
     } else {
@@ -34,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Si no hay errores, intentamos autenticar al usuario
     if (empty($errorMsg)) {
         try {
-            // Obtenemos la conexión a la base de datos
+            // Obtenemos conexión a la base de datos
             $conn = getConnection();
             
             // Preparamos la consulta para buscar al usuario
@@ -71,12 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <link rel="icon" href="images/fevicon.png" type="image/gif" />
   <meta name="keywords" content="" />
   <meta name="description" content="" />
@@ -84,24 +79,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <title>Skyvault</title>
 
-
-  <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-
-  <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-  <!-- font awesome style -->
-  <link href="css/font-awesome.min.css" rel="stylesheet" />
-
-  <!-- Custom styles for this template -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
-
   <script src="js/dotlottie-player.min.js"></script>
 
-  <!-- Add this new style to center the logo and title -->
+  <!-- Nuevo estilo centro del logo y título -->
   <style>
     .navbar-brand {
       display: flex;
@@ -120,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       height: 40px;
       margin-right: 15px;
     }
-    /* Ensure the navbar is properly aligned for responsive design */
+    /* navbar alineado con el diseño responsive */
     @media (max-width: 991.98px) {
       .navbar-brand {
         margin: 0;
@@ -161,13 +145,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
     
-    /* Message container for alerts */
     .message-container {
       min-height: 60px;
       margin-bottom: 10px;
     }
     
-    /* Form container adjustment */
     .contact_section .form_container {
       margin-top: -20px !important;
     }
@@ -178,12 +160,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="sub_page">
 
   <div class="hero_area">
-    <!-- header section strats -->
   <?php include 'header.php'; ?>
-    <!-- end header section -->
   </div>
 
-<!-- login section -->
 <section class="contact_section layout_padding">
   <div class="container">
     <div class="heading_container heading_center">
@@ -221,20 +200,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
 </section>
-<!-- end login section -->
 
-  <!-- incluir el footer -->
 <?php include 'footer.php'; ?>
-          <!--  -->
-
-  <!-- jQery -->
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <!-- bootstrap js -->
-  <script src="js/bootstrap.js"></script>
-  <!-- custom js -->
-  <script src="js/custom.js"></script>
-
 
 </body>
-
 </html>
